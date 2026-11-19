@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-XAkfHB3/K2WUWQ+OQVejZT/a04uFcJzVS5DI1dv5Gxs='; base-uri 'none'; form-action 'none'">
+<title>Connecting to QuickBooks</title>
+</head>
+<body>
+<h1>Connecting to QuickBooks</h1>
+<p id="message">Returning to the connector on your computer...</p>
+<noscript><p>This page needs JavaScript to hand the sign-in back to the connector on your computer. Turn JavaScript on for this page, then start the connection again from Claude.</p></noscript>
+<script>
+(function () {
+  "use strict";
+  // Must match QBO_LOCAL_CALLBACK_URL on every computer that uses this page.
+  var LOCAL_CALLBACK = "http://localhost:3000/callback";
+  // Only the values the connector needs; anything else Intuit adds is dropped.
+  var KEYS = ["code", "state", "realmId", "error"];
+  var query = new URLSearchParams(window.location.search);
+  var forward = new URLSearchParams();
+  KEYS.forEach(function (key) {
+    var value = query.get(key);
+    if (value !== null) forward.set(key, value);
+  });
+  // Keep the one-time code out of the address bar and the browser history.
+  history.replaceState(null, "", window.location.pathname);
+  if (!forward.has("state")) {
+    document.getElementById("message").textContent =
+      "This page did not receive a sign-in answer from Intuit. Start the connection again from Claude.";
+    return;
+  }
+  window.location.replace(LOCAL_CALLBACK + "?" + forward.toString());
+})();
+</script>
+</body>
+</html>
